@@ -1,0 +1,22 @@
+# Dependencies
+vendor/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Caches
+.phpunit.result.cache
+.php-cs-fixer.cache
+phpcs-cache/
+
+# Build
+dist/
+*.zip
