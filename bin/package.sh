@@ -14,7 +14,7 @@
 
 set -e
 
-PLUGINS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PLUGINS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 DIST_DIR="$PLUGINS_DIR/dist"
 
 # All packagable plugins.
@@ -55,7 +55,51 @@ package_plugin() {
 	echo "Packaging $plugin v$version..."
 
 	# Copy plugin to temp directory.
-	rsync -a --exclude-from="$plugin_dir/.distignore" "$plugin_dir/" "$tmp_dir/$plugin/"
+	# --exclude='.*' is a catch-all for hidden files (.git, .DS_Store, .vscode,
+	# .phpunit.result.cache, etc.) so they can never leak into the zip even if
+	# a plugin's .distignore forgets to list them. WordPress plugins don't need
+	# to ship dotfiles.
+	rsync -a \
+		--exclude='.*' \
+		--exclude-from="$plugin_dir/.distignore" \
+		"$plugin_dir/" "$tmp_dir/$plugin/"
+
+	# If the plugin uses Composer, install production-only deps into the temp copy
+	# so dev tools (phpunit, phpstan, phpcs, etc.) don't ship to end users.
+	if [ -f "$plugin_dir/composer.json" ]; then
+		# composer.json is in .distignore so the rsync skipped it — copy it back
+		# temporarily for the install, plus the lock file for reproducibility.
+		cp "$plugin_dir/composer.json" "$tmp_dir/$plugin/composer.json"
+		[ -f "$plugin_dir/composer.lock" ] && cp "$plugin_dir/composer.lock" "$tmp_dir/$plugin/composer.lock"
+
+		# Replace any rsynced vendor/ with a clean prod-only one.
+		rm -rf "$tmp_dir/$plugin/vendor"
+
+		(
+			cd "$tmp_dir/$plugin"
+			composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --quiet
+		)
+
+		# Remove composer files from the dist; end users should never run composer
+		# on an installed plugin and the prod vendor/ is already baked in.
+		rm -f "$tmp_dir/$plugin/composer.json" "$tmp_dir/$plugin/composer.lock"
+
+		# Strip hidden files that third-party packages bring in (e.g. .gitignore,
+		# .github, .editorconfig). The earlier rsync only covered the dev tree.
+		find "$tmp_dir/$plugin/vendor" -name '.*' -print0 2>/dev/null | xargs -0 rm -rf
+
+		# Strip docs and dev files third-party packages ship (CHANGELOG, README,
+		# tests, examples). LICENSE-style files are kept — legally required.
+		find "$tmp_dir/$plugin/vendor" \
+			\( -iname 'CHANGELOG*' -o -iname 'README*' -o -iname 'CONTRIBUTING*' \
+			   -o -iname 'UPGRADING*' -o -iname 'UPGRADE*' -o -iname '*.dist' \
+			   -o -name 'justfile' -o -name 'Makefile' -o -name 'phpunit.xml*' \
+			\) -type f -delete 2>/dev/null
+		find "$tmp_dir/$plugin/vendor" \
+			\( -name 'tests' -o -name 'Tests' -o -name 'test' -o -name 'Test' \
+			   -o -name 'examples' -o -name 'example' -o -name 'docs' -o -name 'doc' \
+			\) -type d -prune -exec rm -rf {} + 2>/dev/null
+	fi
 
 	# Remove any empty directories left behind.
 	find "$tmp_dir/$plugin" -type d -empty -delete 2>/dev/null || true
