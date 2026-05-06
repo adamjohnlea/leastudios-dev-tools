@@ -23,6 +23,7 @@ ALL_PLUGINS=(
 	leastudios-payments
 	leastudios-forms
 	leastudios-mailer
+	leastudios-siteaudit
 	leastudios-email-templates
 )
 
