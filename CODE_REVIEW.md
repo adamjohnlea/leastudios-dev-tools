@@ -99,6 +99,12 @@ All three plugins demonstrate **strong code quality and security fundamentals**.
 
 **This plugin has no other actionable issues.** It is production-ready.
 
+**Resolution (2026-05-19):** All three items addressed.
+
+1. Resolved — `Options_Encryptor::derive_key()` `wp_die()`s when `AUTH_KEY` / `SECURE_AUTH_SALT` are undefined; no silent fallback remains.
+2. Resolved — `SNS_Controller::verify_request()` enforces an IP-based fixed-window rate limit (`leastudios_mailer_sns_rate_limit`, default 120 per 60s) before signature verification.
+3. Resolved — `Settings_Page::sanitize_options()` validates AWS Access Key ID / Secret Access Key format and rejects malformed values with an admin error notice.
+
 ---
 
 ## Plugin: leastudios-snippets
