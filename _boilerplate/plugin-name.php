@@ -5,7 +5,7 @@
  * Description:       A brief description of the plugin.
  * Version:           1.0.0
  * Requires at least: 6.4
- * Requires PHP:      8.1
+ * Requires PHP:      8.2
  * Author:            leaStudios
  * Author URI:        https://leastudios.com
  * License:           GPL-2.0-or-later
@@ -39,7 +39,7 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
  */
 function plugin_name_init(): void {
 	// Check minimum requirements.
-	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 		add_action( 'admin_notices', 'plugin_name_php_version_notice' );
 		return;
 	}
@@ -58,7 +58,7 @@ add_action( 'plugins_loaded', 'plugin_name_init' );
 function plugin_name_php_version_notice(): void {
 	printf(
 		'<div class="notice notice-error"><p>%s</p></div>',
-		esc_html__( 'Plugin Name requires PHP 8.1 or higher.', 'plugin-name' )
+		esc_html__( 'Plugin Name requires PHP 8.2 or higher.', 'plugin-name' )
 	);
 }
 
