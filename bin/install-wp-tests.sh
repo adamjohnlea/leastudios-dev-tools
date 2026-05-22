@@ -68,7 +68,13 @@ install_test_suite() {
 	mkdir -p "$WP_TESTS_DIR"
 
 	# Download the full WordPress develop repo test suite via GitHub tarball.
+	# The wordpress-develop repo tags every release with a three-part version
+	# (e.g. 7.0.0), while the wordpress.org API reports major releases with
+	# two parts (e.g. 7.0). Normalise so the tag URL resolves.
 	local ARCHIVE_NAME="${WP_VERSION}"
+	if [[ "$ARCHIVE_NAME" =~ ^[0-9]+\.[0-9]+$ ]]; then
+		ARCHIVE_NAME="${ARCHIVE_NAME}.0"
+	fi
 	local ARCHIVE_URL="https://github.com/WordPress/wordpress-develop/archive/refs/tags/${ARCHIVE_NAME}.tar.gz"
 
 	download "$ARCHIVE_URL" /tmp/wp-develop.tar.gz
