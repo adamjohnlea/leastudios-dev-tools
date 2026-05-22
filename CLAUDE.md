@@ -37,7 +37,7 @@ plugins/
 
 1. Copy `_boilerplate/` to `<new-plugin-name>/`
 2. Find-and-replace across all files:
-   - `plugin-name` → `new-plugin-name` (text domain, slugs)
+   - `plugin-name` → `new-plugin-name` (text domain, slugs, and the CI workflow's checkout path / `working-directory` keys in `.github/workflows/ci.yml`)
    - `Plugin Name` → `New Plugin Name` (display name)
    - `PluginName` → `NewPluginName` (namespace)
    - `PLUGIN_NAME` → `NEW_PLUGIN_NAME` (constants)
