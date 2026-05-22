@@ -7,7 +7,8 @@ This repo is **not a plugin**. It's the development home for:
 - **`_boilerplate/`** — the starting scaffold for any new leaStudios plugin (PSR-4, modern PHP 8.1+, REST controller stub, security helpers, sample test).
 - **`bin/install-wp-tests.sh`** — installs the WordPress test library (`wordpress-tests-lib`) into a temp dir so each plugin can run `phpunit` against a real WordPress.
 - **`bin/package.sh`** — packages a plugin into a distributable `.zip` (respecting each plugin's `.distignore`).
-- **`bin/check-shared.sh`** — verifies that classes intentionally duplicated across the plugins (`Security/Nonce.php`, `Encryption/Options_Encryptor.php`, `Shared/Datetime_Util.php`) remain in sync. Exits non-zero on drift, with a normalized diff so you can see exactly what changed. Run before cutting a release.
+- **`bin/check-shared.sh`** — verifies that files intentionally duplicated across the plugins (`Security/Nonce.php`, `Encryption/Options_Encryptor.php`, `Shared/Datetime_Util.php`, and their duplicated tests) remain in sync. Exits non-zero on drift, with a normalized diff so you can see exactly what changed. Enforced automatically — see "Check shared files for drift" below.
+- **`bin/git-hooks/`** + **`bin/install-hooks.sh`** — a shared `pre-push` hook that runs `check-shared.sh` before every push, plus a one-time installer that wires it into each suite repo.
 - **`config-templates/`** — canonical `phpcs.xml.dist`, `phpstan.neon`, `phpunit.xml.dist`, and `tests/bootstrap.php` templates that every plugin repo copies in.
 - **`CLAUDE.md`** — project-wide development conventions (coding standards, security rules, WordPress patterns) that apply across all leaStudios plugins.
 - **`CODE_REVIEW.md`** — historical code-review notes for the plugin family.
@@ -71,13 +72,27 @@ bash leastudios-dev-tools/bin/package.sh leastudios-payments
 
 Or `bash leastudios-dev-tools/bin/package.sh all` to package every plugin.
 
-### Check shared classes for drift
+### Check shared files for drift
 
 ```bash
 bash leastudios-dev-tools/bin/check-shared.sh
 ```
 
-Confirms that classes duplicated across plugins by design (e.g. `Security/Nonce.php`) haven't drifted. Exits 0 if everything's in sync, 1 with a normalized diff if anything has changed. Add new shared files by appending to `SHARED_FILES` in the script.
+Confirms that files duplicated across plugins by design (e.g. `Security/Nonce.php` and its tests) haven't drifted. Exits 0 if everything's in sync, 1 with a normalized diff if anything has changed. Add new shared files by appending to `SHARED_FILES` in the script (paths are relative to each plugin root).
+
+This check runs automatically, so drift is caught without anyone remembering to run it:
+
+- **Pre-push hook (local).** Run the one-time installer after cloning the suite:
+
+  ```bash
+  bash leastudios-dev-tools/bin/install-hooks.sh
+  ```
+
+  It points each repo's `core.hooksPath` at `bin/git-hooks`, so a push that would introduce drift is blocked before it leaves your machine. Re-run it after adding a new plugin repo.
+
+- **CI (GitHub Actions).** `.github/workflows/check-shared.yml` in this repo checks out the suite and runs the same check on every push to `leastudios-dev-tools`, on a weekly schedule, and on demand (`workflow_dispatch`). The private `leastudios-siteaudit` repo is not cloned in CI; the pre-push hook covers it.
+
+`check-shared.sh` still needs the whole suite checked out as siblings — it cannot run inside a single isolated plugin clone.
 
 ## Versioning
 

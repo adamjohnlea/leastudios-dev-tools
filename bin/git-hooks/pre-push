@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# pre-push — guards the leaStudios shared-by-duplication files.
+#
+# This hook is shared across every suite repo: it lives in
+# leastudios-dev-tools/bin/git-hooks and is wired in by bin/install-hooks.sh,
+# which points each repo's core.hooksPath here. Editing this one file updates
+# the hook for every repo at once.
+#
+# It runs check-shared.sh, which compares the helper classes duplicated across
+# the plugins (and their tests) and exits non-zero on drift. A non-zero exit
+# blocks the push, so drift is caught before it is shared.
+
+set -u
+
+hook_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+check_shared="$hook_dir/../check-shared.sh"
+
+if [ ! -x "$check_shared" ]; then
+	echo "pre-push: check-shared.sh not found at $check_shared — skipping drift check." >&2
+	echo "pre-push: is leastudios-dev-tools checked out alongside the plugin repos?" >&2
+	exit 0
+fi
+
+if output="$( "$check_shared" 2>&1 )"; then
+	echo "pre-push: shared-file drift check passed."
+	exit 0
+fi
+
+echo "$output" >&2
+echo >&2
+echo "pre-push BLOCKED: leaStudios shared-by-duplication files have drifted." >&2
+echo "Every copy of a shared file must stay byte-identical (modulo namespace)." >&2
+echo "Reconcile the copies shown above, then push again." >&2
+echo "Do not bypass with --no-verify — the same check runs in CI." >&2
+exit 1

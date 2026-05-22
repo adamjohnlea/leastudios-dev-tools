@@ -1,0 +1,59 @@
+name: check-shared
+
+# Verifies the shared-by-duplication helper classes (and their tests) stay in
+# sync across the leaStudios plugin suite. check-shared.sh needs every plugin
+# checked out as a sibling, so this suite-level job assembles them.
+#
+# leastudios-siteaudit is a private repo and is intentionally NOT checked out
+# here — cloning it would require a PAT secret. Its copies are covered by the
+# local pre-push hook (developers always have the full suite checked out).
+# The five public plugins are covered end to end.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  check-shared:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out leastudios-dev-tools
+        uses: actions/checkout@v4
+        with:
+          path: leastudios-dev-tools
+
+      - name: Check out leastudios-payments
+        uses: actions/checkout@v4
+        with:
+          repository: adamjohnlea/leastudios-payments
+          path: leastudios-payments
+
+      - name: Check out leastudios-mailer
+        uses: actions/checkout@v4
+        with:
+          repository: adamjohnlea/leastudios-mailer
+          path: leastudios-mailer
+
+      - name: Check out leastudios-forms
+        uses: actions/checkout@v4
+        with:
+          repository: adamjohnlea/leastudios-forms
+          path: leastudios-forms
+
+      - name: Check out leastudios-snippets
+        uses: actions/checkout@v4
+        with:
+          repository: adamjohnlea/leastudios-snippets
+          path: leastudios-snippets
+
+      - name: Check out leastudios-email-templates
+        uses: actions/checkout@v4
+        with:
+          repository: adamjohnlea/leastudios-email-templates
+          path: leastudios-email-templates
+
+      - name: Run shared-file drift check
+        run: bash leastudios-dev-tools/bin/check-shared.sh

@@ -21,11 +21,16 @@ set -u
 
 PLUGINS_DIR="${PLUGINS_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 
-# Files duplicated across plugins. Each entry is a path under <plugin>/src/.
+# Files duplicated across plugins. Each entry is a path relative to the
+# plugin root, so both src/ classes and their tests/ counterparts can be
+# governed (a duplicated class whose test can silently drift is only half
+# protected).
 SHARED_FILES=(
-	"Security/Nonce.php"
-	"Encryption/Options_Encryptor.php"
-	"Shared/Datetime_Util.php"
+	"src/Security/Nonce.php"
+	"src/Encryption/Options_Encryptor.php"
+	"src/Shared/Datetime_Util.php"
+	"tests/Options_EncryptorTest.php"
+	"tests/Datetime_UtilTest.php"
 )
 
 # Plugins to inspect, in canonical order. The first plugin that ships a given
@@ -95,7 +100,7 @@ for shared in "${SHARED_FILES[@]}"; do
 	reference_hash=""
 	reference_plugin=""
 	for plugin in "${PLUGINS[@]}"; do
-		path="$PLUGINS_DIR/leastudios-$plugin/src/$shared"
+		path="$PLUGINS_DIR/leastudios-$plugin/$shared"
 		if [ ! -f "$path" ]; then
 			continue
 		fi
@@ -109,9 +114,9 @@ for shared in "${SHARED_FILES[@]}"; do
 		else
 			printf "   [DIFF] leastudios-%s (vs leastudios-%s)\n" "$plugin" "$reference_plugin"
 			diff -u \
-				--label "leastudios-$reference_plugin/src/$shared (normalized)" \
-				--label "leastudios-$plugin/src/$shared (normalized)" \
-				<(normalize "$PLUGINS_DIR/leastudios-$reference_plugin/src/$shared") \
+				--label "leastudios-$reference_plugin/$shared (normalized)" \
+				--label "leastudios-$plugin/$shared (normalized)" \
+				<(normalize "$PLUGINS_DIR/leastudios-$reference_plugin/$shared") \
 				<(normalize "$path") \
 				| sed 's/^/         /'
 			drift_count=$((drift_count + 1))
