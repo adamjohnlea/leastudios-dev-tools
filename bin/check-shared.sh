@@ -42,15 +42,17 @@ PLUGINS=(
 	snippets
 	siteaudit
 	email-templates
+	helpscout-ai-dashboard
 )
 
 # Plugin-specific tokens used inside class bodies. Each parallel list maps
-# 1:1 across the 6 plugins. Kept as separate variables because slugs, namespace
-# segments, and human-readable display names don't share a 1:1 mapping.
-SLUG_ALTERNATION="payments|mailer|forms|snippets|siteaudit|email_templates"
-DASH_ALTERNATION="payments|mailer|forms|snippets|siteaudit|email-templates"
-NS_ALTERNATION="Payments|Mailer|Forms|Snippets|SiteAudit|EmailTemplates"
-DISPLAY_ALTERNATION="Payments|Mailer|Forms|Snippets|Site ?Audit|Email Templates"
+# 1:1 across the plugins above. Kept as separate variables because slugs,
+# namespace segments, and human-readable display names don't share a 1:1
+# mapping.
+SLUG_ALTERNATION="payments|mailer|forms|snippets|siteaudit|email_templates|helpscout_ai_dashboard"
+DASH_ALTERNATION="payments|mailer|forms|snippets|siteaudit|email-templates|helpscout-ai-dashboard"
+NS_ALTERNATION="Payments|Mailer|Forms|Snippets|SiteAudit|EmailTemplates|HelpScoutAIDashboard"
+DISPLAY_ALTERNATION="Payments|Mailer|Forms|Snippets|Site ?Audit|Email Templates|Help Scout AI Dashboard"
 
 # Normalize a PHP source file for comparison:
 #   - strip /* ... */ block comments (including docblocks)
