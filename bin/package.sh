@@ -82,9 +82,9 @@ package_plugin() {
 			composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --quiet
 		)
 
-		# Remove composer files from the dist; end users should never run composer
-		# on an installed plugin and the prod vendor/ is already baked in.
-		rm -f "$tmp_dir/$plugin/composer.json" "$tmp_dir/$plugin/composer.lock"
+		# Remove composer.lock from the dist (dev-only, not needed at runtime).
+		# Keep composer.json so Plugin Check doesn't warn about an orphan vendor/.
+		rm -f "$tmp_dir/$plugin/composer.lock"
 
 		# Strip hidden files that third-party packages bring in (e.g. .gitignore,
 		# .github, .editorconfig). The earlier rsync only covered the dev tree.
