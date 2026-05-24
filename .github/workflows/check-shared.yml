@@ -21,36 +21,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out leastudios-dev-tools
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: leastudios-dev-tools
 
       - name: Check out leastudios-payments
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adamjohnlea/leastudios-payments
           path: leastudios-payments
 
       - name: Check out leastudios-mailer
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adamjohnlea/leastudios-mailer
           path: leastudios-mailer
 
       - name: Check out leastudios-forms
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adamjohnlea/leastudios-forms
           path: leastudios-forms
 
       - name: Check out leastudios-snippets
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adamjohnlea/leastudios-snippets
           path: leastudios-snippets
 
       - name: Check out leastudios-email-templates
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adamjohnlea/leastudios-email-templates
           path: leastudios-email-templates
