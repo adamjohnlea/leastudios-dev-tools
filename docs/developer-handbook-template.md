@@ -6,7 +6,7 @@
   1. Copy this file to `<your-plugin>/docs/developer-handbook.md`.
   2. Replace every `<placeholder>` (angle-bracketed) with concrete content.
   3. Delete sections that don't apply per the optional/required column in the spec.
-  4. Renumber the surviving sections sequentially (1, 2, 3, ...).
+  4. Renumber the surviving sections sequentially in the heading text (## 1, ## 2, ...) and update the matching TOC entries and anchors.
   5. Run `bash leastudios-dev-tools/bin/check-handbook.sh <your-plugin>/docs/developer-handbook.md`
      and resolve any missing-section errors before committing.
 
