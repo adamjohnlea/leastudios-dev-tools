@@ -22,7 +22,12 @@ declare(strict_types=1);
 defined( 'ABSPATH' ) || exit;
 
 // Plugin constants.
-define( 'PLUGIN_NAME_VERSION', '1.0.0' );
+// Derive the version from the plugin header so the runtime constant can
+// never drift from the version shipped in the release zip.
+define(
+	'PLUGIN_NAME_VERSION',
+	get_file_data( __FILE__, [ 'Version' => 'Version' ] )['Version']
+);
 define( 'PLUGIN_NAME_FILE', __FILE__ );
 define( 'PLUGIN_NAME_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PLUGIN_NAME_URL', plugin_dir_url( __FILE__ ) );
