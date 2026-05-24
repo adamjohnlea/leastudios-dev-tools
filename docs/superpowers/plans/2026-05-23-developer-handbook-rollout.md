@@ -1146,3 +1146,24 @@ After writing this plan, I checked it against the spec:
 - Generating handbooks from code (no `@hook` PHPDoc parsing).
 - Restructuring CLAUDE.md or README.md.
 - A single shared handbook for the whole suite.
+
+---
+
+## Justification: no handbook for leastudios-dev-tools
+
+Surface audit on 2026-05-24 found:
+- 0 `apply_filters` / `do_action` calls in `src/`.
+- 0 `register_rest_route` calls in `src/`.
+- 0 `WP_CLI::add_command` calls in `src/`.
+- `src/` directory: does not exist.
+- `bin/` scripts: `check-handbook.sh`, `check-shared.sh`, `git-hooks/`, `install-hooks.sh`, `install-wp-tests.sh`, `package.sh`.
+- Top-level dirs: `_boilerplate/`, `config-templates/`, `docs/`, plus `CLAUDE.md`, `CODE_REVIEW.md`, `README.md`.
+
+`leastudios-dev-tools` ships scaffolding (`_boilerplate/`), release/CI scripts in `bin/`, the mother CLAUDE.md, and (now) the canonical developer-handbook template + spec + plan. None of this is "extension surface" — it is internal suite tooling consumed via copy-paste (`_boilerplate`) or direct invocation (`bin/*.sh`). The content that a developer needs is already covered by:
+
+- `CLAUDE.md` (mother CLAUDE.md for the whole suite)
+- `README.md` (suite-tooling overview)
+- `docs/developer-handbook-template.md` (the canonical template for sibling plugins)
+- `bin/*.sh` (release scaffolding, used directly from sibling plugin Makefiles/CI)
+
+Writing a fourth doc would duplicate the first three. Decision: skip.
