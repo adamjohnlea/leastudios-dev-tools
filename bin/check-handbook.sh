@@ -28,6 +28,17 @@ required=(
   "Where to Read More"
 )
 
+# Allow no-hooks plugins to opt out of the hooks sections.
+if grep -Fq "This plugin exposes no PHP hooks; integration is REST-only." "$handbook"; then
+  filtered=()
+  for s in "${required[@]}"; do
+    if [[ "$s" != "Hooks Reference" && "$s" != "Hook Execution Order" ]]; then
+      filtered+=("$s")
+    fi
+  done
+  required=("${filtered[@]}")
+fi
+
 missing=()
 for section in "${required[@]}"; do
   # Match "## N. Section Name" or "## Section Name" — N may be any digits.
