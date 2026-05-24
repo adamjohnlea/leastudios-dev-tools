@@ -90,8 +90,10 @@ class Migration {
 	public static function drop_tables(): void {
 		global $wpdb;
 
+		$table = $wpdb->prefix . 'plugin_name_items';
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}plugin_name_items" );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $table ) );
 
 		delete_option( self::SCHEMA_VERSION_KEY );
 	}

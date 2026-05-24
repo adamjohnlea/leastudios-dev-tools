@@ -33,6 +33,13 @@ SHARED_FILES=(
 	"tests/Datetime_UtilTest.php"
 )
 
+# Plugin-agnostic shared files (bash scripts, configs) that must be
+# byte-identical — no PHP-normalization, no token rewriting. Drift here is
+# always a real bug because there is no per-plugin variation by design.
+RAW_SHARED_FILES=(
+	"bin/check-db-interpolation.sh"
+)
+
 # Plugins to inspect, in canonical order. The first plugin that ships a given
 # file becomes the reference for that file in the report.
 PLUGINS=(
@@ -120,6 +127,37 @@ for shared in "${SHARED_FILES[@]}"; do
 				--label "leastudios-$plugin/$shared (normalized)" \
 				<(normalize "$PLUGINS_DIR/leastudios-$reference_plugin/$shared") \
 				<(normalize "$path") \
+				| sed 's/^/         /'
+			drift_count=$((drift_count + 1))
+		fi
+		checked_count=$((checked_count + 1))
+	done
+	echo
+done
+
+for shared in "${RAW_SHARED_FILES[@]}"; do
+	echo "── $shared (raw)"
+	reference_hash=""
+	reference_plugin=""
+	for plugin in "${PLUGINS[@]}"; do
+		path="$PLUGINS_DIR/leastudios-$plugin/$shared"
+		if [ ! -f "$path" ]; then
+			continue
+		fi
+		hash=$(shasum -a 256 "$path" | cut -d' ' -f1)
+		if [ -z "$reference_hash" ]; then
+			reference_hash="$hash"
+			reference_plugin="$plugin"
+			printf "   [ref ] leastudios-%s\n" "$plugin"
+		elif [ "$hash" = "$reference_hash" ]; then
+			printf "   [ ok ] leastudios-%s\n" "$plugin"
+		else
+			printf "   [DIFF] leastudios-%s (vs leastudios-%s)\n" "$plugin" "$reference_plugin"
+			diff -u \
+				--label "leastudios-$reference_plugin/$shared" \
+				--label "leastudios-$plugin/$shared" \
+				"$PLUGINS_DIR/leastudios-$reference_plugin/$shared" \
+				"$path" \
 				| sed 's/^/         /'
 			drift_count=$((drift_count + 1))
 		fi

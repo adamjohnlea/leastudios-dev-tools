@@ -16,5 +16,17 @@
         "platform": {
             "php": "8.2"
         }
+    },
+    "scripts": {
+        "phpcs": "phpcs",
+        "phpcbf": "phpcbf",
+        "phpstan": "phpstan analyse --memory-limit=2G",
+        "lint:db": "bash bin/check-db-interpolation.sh",
+        "lint": [
+            "@phpcs",
+            "@phpstan",
+            "@lint:db"
+        ],
+        "test": "phpunit"
     }
 }

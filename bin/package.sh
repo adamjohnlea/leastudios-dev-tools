@@ -25,6 +25,7 @@ ALL_PLUGINS=(
 	leastudios-mailer
 	leastudios-siteaudit
 	leastudios-email-templates
+	leastudios-helpscout-ai-dashboard
 )
 
 package_plugin() {
