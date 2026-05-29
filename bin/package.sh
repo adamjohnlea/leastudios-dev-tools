@@ -61,8 +61,18 @@ package_plugin() {
 	# .phpunit.result.cache, etc.) so they can never leak into the zip even if
 	# a plugin's .distignore forgets to list them. WordPress plugins don't need
 	# to ship dotfiles.
+	#
+	# The root-anchored excludes below are a suite-wide guard for AI/developer
+	# guidance and readme files: they must never ship in a distributable,
+	# regardless of whether a given plugin's .distignore lists them. Note this
+	# excludes README.md (the GitHub/dev readme) but NOT readme.txt — the
+	# WordPress.org plugin readme, which is required in the zip.
 	rsync -a \
 		--exclude='.*' \
+		--exclude='/AGENTS.md' \
+		--exclude='/CLAUDE.md' \
+		--exclude='/GEMINI.md' \
+		--exclude='/README.md' \
 		--exclude-from="$plugin_dir/.distignore" \
 		"$plugin_dir/" "$tmp_dir/$plugin/"
 
